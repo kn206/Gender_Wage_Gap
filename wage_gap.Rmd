@@ -1,0 +1,142 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+
+---
+
+#Loading the Data 
+```{r}
+library(readr)
+wage_gap<-DP_LIVE_27052023133647764 <- read_csv("C:/Users/DELL LATITUDE E7270/Documents/AE_hypothesi/DP_LIVE_27052023133647764.csv")
+View(wage_gap)
+```
+
+
+#Data Exploration 
+```{r}
+# View the first few rows of the data
+head(wage_gap)
+
+# View the summary statistics of the data
+summary(wage_gap)
+
+# Check the column names
+colnames(wage_gap)
+
+# Check the data types of each column
+str(data)
+
+```
+
+
+#Data Transformation 
+```{r}
+# Droping the "Flag Codes" variable
+wage_gap <- subset(wage_gap, select = -`Flag Codes`)
+View(wage_gap)
+```
+The "Flag Codes" column is being dropped from the data set because it doesn't contain any values and is not considered important for our analysis. Since the column is empty, it does not provide any meaningful information or contribute to the variables we are examining. Therefore, removing it simplifies the data set and focuses our analysis on the relevant variables.
+
+#Checking Missing Values
+```{r}
+colSums(is.na(wage_gap))
+```
+Our data set has no missing values now
+
+#Data Visualization
+1.A bar chart to compare wages across different subjects.
+```{r}
+library(ggplot2)
+ggplot(wage_gap, aes(x = SUBJECT, y = Value, fill = SUBJECT)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Subject", y = "Wage", title = "Wage Comparison across Subjects") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+This bar chart compares the wages across different subjects(employee and self employed). Each bar represents a subject, and the height of the bar corresponds to the wage value. By examining the bar heights, we can observe variations in wages across different subjects.
+
+2. Line plot
+A line graph to show the wage trend over time for a specific location.
+```{r}
+
+library(ggplot2)
+ggplot(wage_gap, aes(x = TIME, y = Value, color = LOCATION)) +
+  geom_line() +
+  labs(x = "Time", y = "Wage", color = "Location", title = "Wage Trend over Time by Location")
+
+```
+
+This line plot displays the wage trend over time for different locations. Each line represents a specific location, and the x-axis represents time while the y-axis represents wage values. By examining the lines, we can identify the wage trends across different locations.
+
+3. Box plot 
+A boxplot to compare the wage distributions across different indicators.
+```{r}
+# wage_data is the data frame and 'Value' is the wage variable
+ggplot(wage_gap, aes(x = INDICATOR, y = Value)) +
+  geom_boxplot(fill = "lightblue", color = "black") +
+  labs(x = "Indicator", y = "Wage", title = "Wage Distribution across Indicators") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+This boxplot compares the wage distributions across different indicators. Each boxplot represents an indicator, and the y-axis represents wage values. By comparing the boxplots, we can identify any variations in wage distributions across different indicators.
+
+These visualizations aim to provide insights into the wage data based on the available variables in your dataset.
+
+4. Histogram
+```{r}
+library(ggplot2)
+ggplot(wage_gap, aes(x = Value)) +
+  geom_histogram(fill = "lightblue", color = "black", bins = 20) +
+  labs(x = "Wage", y = "Frequency", title = "Wage Distribution") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+This histogram plot illustrates the distribution of wages in your dataset. The x-axis represents the wage values, divided into several bins. The y-axis represents the frequency or count of wages falling within each bin. By examining the histogram, you can observe the shape and central tendency of the wage distribution, which can provide insights into the wage levels in your data.
+
+
+# Performing the Hypothesis
+Main Hypothesis:
+H1: There is a significant difference in wages across different subjects when considering the variables LOCATION, INDICATOR, SUBJECT, MEASURE, FREQUENCY, TIME, and Value.
+
+Explanation: The main hypothesis focuses on exploring whether there are significant variations in wages across different subjects. It aims to determine if there are substantial differences in wage levels when considering the given variables in your dataset.
+
+To test this hypothesis, we can perform an Analysis of Variance (ANOVA) test. The ANOVA test allows us to compare the means of the wage variable (Value) across the different subject categories. The null hypothesis assumes that there are no significant differences in the means, indicating similar wage levels among subjects. The alternative hypothesis suggests that there is at least one significant difference in the means, indicating variations in wages across subjects.
+
+```{r}
+model <- aov(Value ~ SUBJECT, data = wage_gap)
+summary(model)
+```
+
+
+The ANOVA table displays the degrees of freedom (Df), sum of squares (Sum Sq), mean squares (Mean Sq), F-value, and p-value. In this case, the subject variable (`SUBJECT`) has 1 degree of freedom, indicating that it has one level of categorization. The sum of squares for the subject variable is 43002, and the mean square is also 43002.
+
+The F-value is calculated as 273.5, and the associated p-value is reported as `<2e-16`, which means it is extremely small and essentially zero. 
+
+Interpretation:
+Based on the ANOVA results, there is strong evidence to reject the null hypothesis and conclude that there is a significant difference in wages across different subjects. The extremely small p-value suggests that the variation in wages among subjects is not due to random chance but rather indicates systematic differences.
+
+This finding supports the main hypothesis that there are significant variations in wages when considering the variables LOCATION, INDICATOR, SUBJECT, MEASURE, FREQUENCY, TIME, and Value. The analysis suggests that the subject variable (representing different subjects) is a significant factor in explaining the differences in wages observed in the data set.
+
+
+#Secondary Hypothesis
+```{r}
+# Assuming 'data' is the data frame and 'Value' is the wage variable
+
+t_test_result <- t.test(wage_gap$TIME,wage_gap$Value)
+t_test_result
+
+```
+
+The hypothesis test you performed is a two-sample t-test to compare the means of the variables TIME and Value in the wage_gap dataset. 
+
+The results indicate a highly significant difference between the means of the two variables. The t-value of 4227.6 suggests a substantial difference, and the p-value of < 2.2e-16 indicates that the observed difference is unlikely to occur by chance alone.
+
+The alternative hypothesis, which states that the true difference in means is not equal to zero, is supported by the results. This means that there is a statistically significant difference in the average values of TIME and Value.
+
+The 95% confidence interval of (1985.187, 1987.029) provides a range within which we can be 95% confident that the true difference in means falls. This interval does not contain zero, further supporting the conclusion that there is a significant difference between the two variables.
+
